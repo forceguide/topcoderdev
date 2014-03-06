@@ -1,0 +1,2 @@
+<apex:page controller="PRO_TwitterOAuthController" showHeader="true" sidebar="true" action="{!fetchTwitterAccessToken}">
+</apex:page>

@@ -1,0 +1,77 @@
+<apex:page controller="PRO_OAuthController" showHeader="false" sidebar="false">
+    <apex:sectionHeader subtitle="OAuth Settings" />
+    
+    <apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" />
+   	<apex:styleSheet value="{!URLFOR($Resource.Bootstrap,'css/bootstrap.min.css')}" />
+	<apex:styleSheet value="{!URLFOR($Resource.Bootstrap,'css/bootstrap-theme.min.css')}" /> 
+	<apex:includeScript value="{!URLFOR($Resource.Bootstrap,'js/bootstrap.min.js')}" /> 
+    
+    <apex:pageMessages />
+    <style type="text/css" >
+    	div.errorMessage{
+    		color:red;
+    	}
+    	
+    	div.blankSpace{
+    		width: 20px;
+    	} 
+    </style>
+    <!-- Actual form -->
+    <apex:form styleClass="form-horizontal" > 
+        <br />
+        <br />
+        <apex:pageBlock mode="mainDetail"> 
+        
+        	<!-- Facebook section -->
+        	<div class="form-group">
+        		<label for="facebookLabel" class="col-sm-2 control-label">Facebook</label>
+        		<div class="blankSpace" />
+        		
+        		<div style="padding-top:{!IF(NOT(hasFaceBookSettings),'7px','2px')}"  >
+	        		<!-- If the facebook settings are null  -->
+		            <apex:outputPanel layout="block" styleClass="errorMessage" rendered="{!NOT(hasFaceBookSettings)}" >
+		             	<apex:outputText value="{!fbErrorMessage}" />
+		            </apex:outputPanel>
+		            
+		            <apex:outputText value="{0,date,dd/MM/yyyy HH:mm:ss }"  >
+		            	<apex:param value="{!loggedInUser.Facebook_Last_Fetched_Date_time__c}" />
+		            </apex:outputText>&nbsp;&nbsp;&nbsp;
+		            
+		            <!-- Button is visible only if the current hasnt connected to facebook  -->
+		            <apex:outputLink value="https://www.facebook.com/dialog/oauth?client_id={!$Setup.PRO_Facebook_Settings__c.Client_Id__c}&redirect_uri={!SALESFORCE_BASEURL}/{!$Setup.PRO_Domain_Settings__c.Domain_Name__c}/apex/PRO_FacebookOAuthConnection&response_type=code&scope={!$Setup.PRO_Facebook_Settings__c.Scope__c}" styleClass="btn btn-default" target="_self" rendered="{!hasFaceBookSettings && NOT(fbConnected)}" > 
+						 Connect
+					</apex:outputLink>
+		            
+		            <!-- Button is visible only if the current has already connected to facebook  -->
+		            <apex:commandButton styleClass="btn-xs" value="Revoke" action="{!revokeFacebookAccess}" rendered="{!fbConnected}" />
+	            </div>
+        	</div>
+        	
+        	<!-- Twitter Section  -->
+        	<div class="form-group">
+        		<label for="twitterLabel" class="col-sm-2 control-label">Twitter</label>
+        		<div class="blankSpace" />
+        		
+        		<div style="padding-top:{!IF(NOT(hasTwitterSettings),'7px','2px')}"  >
+	        		<!-- If the facebook settings are null  -->
+		            <apex:outputPanel layout="block" styleClass="errorMessage" rendered="{!NOT(hasTwitterSettings)}" >
+		             	<apex:outputText value="{!tErrorMessage}" />
+		            </apex:outputPanel>
+		            
+		            <apex:outputText value="{0,date,dd/MM/yyyy HH:mm:ss }" rendered="{!NOT(ISNULL(loggedInUser.Twitter_Last_Fetched_Date_time__c))}" >
+		            	<apex:param value="{!loggedInUser.Facebook_Last_Fetched_Date_time__c}" />
+		            </apex:outputText>&nbsp;&nbsp;&nbsp;
+		            
+		            <!-- Button is visible only if the current hasnt connected to facebook  -->
+		            <apex:outputLink value="https://api.twitter.com/oauth/authorize?oauth_consumer_key={!$Setup.PRO_Twitter_Settings__c.Consumer_key__c}&oauth_token={!twitterOauthCode}" styleClass="btn btn-default" target="_self" rendered="{!hasTwitterSettings && NOT(twitterConnected)}" > 
+						 Connect
+					</apex:outputLink>
+		            
+		            <!-- Button is visible only if the current has already connected to facebook  -->
+		            <apex:commandButton styleClass="btn-xs" value="Revoke" action="{!revokeTwitterAccess}" rendered="{!twitterConnected}" />
+	            </div>
+        	</div>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>
